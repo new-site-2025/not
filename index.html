@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - مساعد ذكي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .ai-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+        
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .ai {
+            margin-right: auto;
+        }
+        
+        .user {
+            margin-left: auto;
+        }
+        
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        
+        .ai .message-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #6b7280;
+        }
+        
+        .user .message-sender {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        #messageInput:focus {
+            border-color: #6366f1;
+        }
+        
+        #sendBtn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .command-hint {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+        
+        .secret-mode {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 12px;
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- وضع AI العادي -->
+        <div id="aiMode">
+            <div class="header">
+                <div class="ai-icon">🤖</div>
+                <h1>AI Assistant</h1>
+                <p>مساعد الذكاء الاصطناعي الذكي</p>
+                <div class="status">متصل</div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="messages" id="aiMessages">
+                    <div class="message ai">
+                        <div class="message-content">
+                            <div class="message-sender">AI Assistant</div>
+                            <div>مرحباً! أنا مساعدك الذكي. اكتب <code>/asraa</code> للدخول للوضع السري.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message ai">
+                        <div class="message-content">
+                            <div class="message-sender">AI Assistant</div>
+                            <div>يمكنني مساعدتك في:<br>1. الإجابة على الأسئلة<br>2. توليد الأفكار<br>3. التحليل الذكي</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-container">
+                        <input type="text" id="aiInput" placeholder="اكتب سؤالك هنا..." maxlength="500">
+                        <button id="aiSendBtn">➤</button>
+                    </div>
+                    <div class="command-hint">أمر سري: <code>/asraa</code></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- وضع الشات السري -->
+        <div id="chatMode" style="display: none;">
+            <div class="header">
+                <div class="ai-icon">💬</div>
+                <h1>محادثة خاصة</h1>
+                <p>وضع سري - المشفر</p>
+                <div class="status" id="chatStatus">متصل</div>
+            </div>
+            
+            <div class="secret-mode" id="secretNotice">
+                ⚠️ الوضع السري مفعل - اكتب <code>/d</code> للخروج
+            </div>
+            
+            <div class="chat-container">
+                <div class="messages" id="chatMessages">
+                    <!-- الشات بينكم يظهر هنا -->
+                </div>
+                
+                <div class="input-area">
+                    <div class="input-container">
+                        <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." maxlength="500">
+                        <button id="chatSendBtn">➤</button>
+                    </div>
+                    <div class="command-hint">أمر سري: <code>/d</code> للخروج</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase Config - استخدم config المشروع الحالي
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG0BQmRtK7hUauD4LPAy66xsDpu-qblb4",
+            authDomain: "notttt-264ca.firebaseapp.com",
+            databaseURL: "https://notttt-264ca-default-rtdb.firebaseio.com",
+            projectId: "notttt-264ca",
+            storageBucket: "notttt-264ca.firebasestorage.app",
+            messagingSenderId: "608341167364",
+            appId: "1:608341167364:web:af930a0f3aa2f97a76d451"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // متغيرات التطبيق
+        let username = '';
+        let isChatMode = false;
+        
+        // عناصر DOM
+        const aiMode = document.getElementById('aiMode');
+        const chatMode = document.getElementById('chatMode');
+        const aiInput = document.getElementById('aiInput');
+        const chatInput = document.getElementById('chatInput');
+        const aiMessages = document.getElementById('aiMessages');
+        const chatMessages = document.getElementById('chatMessages');
+        const secretNotice = document.getElementById('secretNotice');
+        
+        // اسم عشوائي إذا ما دخل المستخدم اسم
+        username = 'User_' + Math.floor(Math.random() * 1000);
+        localStorage.setItem('chat_username', username);
+        
+        // تحميل الاسم المحفوظ
+        const savedName = localStorage.getItem('chat_username');
+        if (savedName) username = savedName;
+        
+        // استمع للرسائل في الشات السري
+        database.ref('secret_chat').on('child_added', (snapshot) => {
+            const msg = snapshot.val();
+            if (isChatMode) {
+                displayChatMessage(msg);
+            }
+        });
+        
+        // وظيفة عرض رسائل الشات السري
+        function displayChatMessage(msg) {
+            const div = document.createElement('div');
+            const isMe = msg.sender === username;
+            
+            div.className = `message ${isMe ? 'user' : 'ai'}`;
+            div.innerHTML = `
+                <div class="message-content">
+                    <div class="message-sender">${msg.sender}</div>
+                    <div>${msg.text}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // وظيفة إرسال في وضع AI
+        function sendAIMessage() {
+            const text = aiInput.value.trim();
+            if (!text) return;
+            
+            if (text === '/asraa') {
+                // التبديل للشات السري
+                aiMode.style.display = 'none';
+                chatMode.style.display = 'block';
+                secretNotice.style.display = 'block';
+                isChatMode = true;
+                chatInput.focus();
+                
+                // إضافة رسالة ترحيبية
+                const welcomeMsg = {
+                    text: `🔐 ${username} دخل للوضع السري`,
+                    sender: 'System',
+                    time: Date.now()
+                };
+                database.ref('secret_chat').push(welcomeMsg);
+            } else {
+                // رد AI عادي
+                const aiResponse = getAIResponse(text);
+                const div = document.createElement('div');
+                div.className = 'message ai';
+                div.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-sender">AI Assistant</div>
+                        <div>${aiResponse}</div>
+                    </div>
+                `;
+                aiMessages.appendChild(div);
+            }
+            
+            aiInput.value = '';
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+        }
+        
+        // وظيفة إرسال في الشات السري
+        function sendChatMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            
+            if (text === '/d') {
+                // الخروج من الوضع السري ومسح الشات
+                chatMode.style.display = 'none';
+                aiMode.style.display = 'block';
+                secretNotice.style.display = 'none';
+                isChatMode = false;
+                
+                // مسح جميع الرسائل من Firebase
+                database.ref('secret_chat').remove();
+                chatMessages.innerHTML = '';
+                
+                aiInput.focus();
+                return;
+            }
+            
+            // إرسال رسالة عادية
+            const message = {
+                text: text,
+                sender: username,
+                time: Date.now()
+            };
+            
+            database.ref('secret_chat').push(message);
+            chatInput.value = '';
+        }
+        
+        // ردود AI بسيطة
+        function getAIResponse(text) {
+            const lower = text.toLowerCase();
+            
+            if (lower.includes('مرحبا') || lower.includes('اهلا')) {
+                return 'مرحباً بك! كيف يمكنني مساعدتك اليوم؟';
+            } else if (lower.includes('اسمك')) {
+                return 'أنا مساعد الذكاء الاصطناعي. يمكنك مناداتي بـ AI';
+            } else if (lower.includes('مساعدة')) {
+                return 'اكتب /asraa للدخول للوضع السري. أو اطرح سؤالك وسأجيب عليه.';
+            } else if (lower.includes('شكر')) {
+                return 'العفو! دائماً سعيد للمساعدة.';
+            } else if (text.includes('؟')) {
+                return 'هذا سؤال جيد. أنصحك باستخدام الوضع السري للمناقشات التفصيلية.';
+            } else {
+                const responses = [
+                    'فهمت سؤالك. هل تريد المزيد من التفاصيل؟',
+                    'هذه نقطة مهمة. يمكننا مناقشتها في الوضع السري.',
+                    'شكراً على مشاركتك هذا. هل لديك أسئلة أخرى؟',
+                    'رائع! هل تريد الانتقال للوضع السري للمناقشة؟'
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+        }
+        
+        // أحداث الأزرار
+        document.getElementById('aiSendBtn').addEventListener('click', sendAIMessage);
+        document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+        
+        // إرسال بالإنتر
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendAIMessage();
+        });
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+        
+        // التركيز على الإدخال عند التحميل
+        window.addEventListener('load', () => {
+            aiInput.focus();
+        });
+        
+        // مسح الشات عند مغادرة الصفحة (إذا كان في وضع سري)
+        window.addEventListener('beforeunload', () => {
+            if (isChatMode) {
+                database.ref('secret_chat').remove();
+            }
+        });
+    </script>
+</body>
+</html>
