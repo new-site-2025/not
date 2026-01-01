@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>دردشة الفلسفة</title>
+    <style>
+        body { font-family: Arial; background: #6a89cc; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; border-radius: 15px; overflow: hidden; }
+        .header { background: #4a69bd; color: white; padding: 20px; text-align: center; }
+        .chat { height: 400px; padding: 20px; overflow-y: auto; background: #f8f9fa; }
+        .message { margin: 10px 0; padding: 10px 15px; border-radius: 15px; max-width: 80%; }
+        .my { background: #4a69bd; color: white; margin-left: auto; }
+        .other { background: #e9ecef; margin-right: auto; }
+        .input-area { padding: 20px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
+        input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 25px; }
+        button { background: #4a69bd; color: white; border: none; padding: 0 25px; border-radius: 25px; cursor: pointer; }
+        .login { background: white; padding: 40px; border-radius: 15px; max-width: 400px; margin: 50px auto; text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- تسجيل الدخول -->
+    <div class="login" id="login">
+        <h2 style="color: #4a69bd;">مناقشة الفلسفة</h2>
+        <input type="text" id="name" placeholder="اسمك" style="width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 10px;">
+        <button onclick="join()" style="width: 100%; padding: 15px; background: #4a69bd; color: white; border: none; border-radius: 10px; cursor: pointer;">
+            دخول
+        </button>
+    </div>
+
+    <!-- الدردشة -->
+    <div class="container" id="chat" style="display: none;">
+        <div class="header">
+            <h3>مناقشة الفلسفة</h3>
+            <div style="font-size: 14px;">متصلين: <span id="count">1</span></div>
+        </div>
+        <div class="chat" id="chatBox"></div>
+        <div class="input-area">
+            <input type="text" id="msg" placeholder="اكتب رسالة..." onkeypress="if(event.key=='Enter') send()">
+            <button onclick="send()">إرسال</button>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // ✅ إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG0BQmRtK7hUauD4LPAy66xsDpu-qblb4",
+            authDomain: "notttt-264ca.firebaseapp.com",
+            databaseURL: "https://notttt-264ca-default-rtdb.firebaseio.com", // تأكد من هذا الرابط
+            projectId: "notttt-264ca",
+            storageBucket: "notttt-264ca.firebasestorage.app",
+            messagingSenderId: "608341167364",
+            appId: "1:608341167364:web:af930a0f3aa2f97a76d451"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        let myName = "";
+        
+        function join() {
+            myName = document.getElementById('name').value.trim();
+            if (!myName) return alert("ادخل اسم");
+            
+            // إخفاء تسجيل الدخول
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('chat').style.display = 'block';
+            
+            // تسجيل الدخول
+            db.ref('users/' + myName).set({
+                name: myName,
+                online: true,
+                time: Date.now()
+            });
+            
+            // تحديث عدد المتصلين
+            db.ref('users').on('value', (snap) => {
+                const users = snap.val();
+                const online = Object.values(users || {}).filter(u => u.online).length;
+                document.getElementById('count').textContent = online;
+            });
+            
+            // استقبال الرسائل
+            db.ref('messages').on('child_added', (snap) => {
+                const msg = snap.val();
+                showMessage(msg);
+                // التمرير لآخر رسالة
+                document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+            });
+            
+            // عند الخروج
+            window.onbeforeunload = () => {
+                db.ref('users/' + myName).remove();
+            };
+            
+            document.getElementById('msg').focus();
+        }
+        
+        function send() {
+            const text = document.getElementById('msg').value.trim();
+            if (!text) return;
+            
+            const msg = {
+                text: text,
+                name: myName,
+                time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now()
+            };
+            
+            db.ref('messages').push(msg);
+            document.getElementById('msg').value = '';
+        }
+        
+        function showMessage(msg) {
+            const div = document.createElement('div');
+            div.className = 'message ' + (msg.name == myName ? 'my' : 'other');
+            div.innerHTML = `
+                <div style="font-weight: bold; font-size: 13px;">${msg.name}</div>
+                <div>${msg.text}</div>
+                <div style="font-size: 11px; color: #888; margin-top: 5px;">${msg.time}</div>
+            `;
+            document.getElementById('chatBox').appendChild(div);
+        }
+    </script>
+</body>
+</html>
