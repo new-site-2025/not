@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملاحظات الفلسفة - مناقشة الطلاب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .login-container h1 {
+            color: #4a69bd;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        #username {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            transition: border 0.3s;
+        }
+        
+        #username:focus {
+            border-color: #4a69bd;
+            outline: none;
+        }
+        
+        #joinBtn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4a69bd 0%, #78e08f 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        #joinBtn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: none;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4a69bd, #78e08f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .online-info {
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #78e08f;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .messages {
+            height: 400px;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
+        
+        .message.me {
+            margin-left: auto;
+        }
+        
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        
+        .message.other .message-content {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.me .message-content {
+            background: linear-gradient(135deg, #4a69bd 0%, #78e08f 100%);
+            color: white;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #555;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            background: white;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        #messageInput:focus {
+            border-color: #4a69bd;
+            outline: none;
+        }
+        
+        #sendBtn {
+            background: linear-gradient(135deg, #4a69bd 0%, #78e08f 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div class="login-container" id="loginScreen">
+        <h1><i class="fas fa-graduation-cap"></i> مناقشة الفلسفة</h1>
+        <p>موقع لتبادل الأسئلة والملاحظات الدراسية بين الطلاب</p>
+        <input type="text" id="username" placeholder="ادخل اسمك" maxlength="20" autocomplete="off">
+        <button id="joinBtn">انضم للمناقشة</button>
+        <p style="margin-top: 20px; font-size: 12px; color: #888;">
+            <i class="fas fa-info-circle"></i> جميع الرسائل مخزنة على خادم مؤقت
+        </p>
+    </div>
+
+    <!-- شاشة الدردشة -->
+    <div class="chat-container" id="chatScreen">
+        <div class="header">
+            <h2><i class="fas fa-book"></i> مناقشة الفلسفة</h2>
+            <div class="online-info">
+                <div class="online-dot"></div>
+                <span id="onlineCount">1</span> طالب متصل
+            </div>
+        </div>
+        <div class="messages" id="messagesContainer">
+            <!-- الرسائل تظهر هنا -->
+        </div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="اكتب سؤال أو رد..." maxlength="500" disabled>
+            <button id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // 🔥🔥🔥 هنا ضع معلومات Firebase الخاصة بك 🔥🔥🔥
+        // 🔥🔥🔥 استخدم الكود اللي عندك لكن بهذا الشكل 🔥🔥🔥
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG0BQmRtK7hUauD4LPAy66xsDpu-qblb4",
+            authDomain: "notttt-264ca.firebaseapp.com",
+            projectId: "notttt-264ca",
+            storageBucket: "notttt-264ca.firebasestorage.app",
+            messagingSenderId: "608341167364",
+            appId: "1:608341167364:web:af930a0f3aa2f97a76d451"
+        };
+
+        // ⚡ تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // متغيرات التطبيق
+        let username = "";
+        let currentUserRef = null;
+
+        // عناصر DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const usernameInput = document.getElementById('username');
+        const joinBtn = document.getElementById('joinBtn');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const onlineCount = document.getElementById('onlineCount');
+
+        // الانضمام للدردشة
+        joinBtn.addEventListener('click', joinChat);
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinChat();
+        });
+
+        function joinChat() {
+            username = usernameInput.value.trim();
+            
+            if (!username) {
+                alert('الرجاء إدخال اسم');
+                return;
+            }
+            
+            // تسجيل دخول المستخدم
+            currentUserRef = database.ref('onlineUsers/' + username);
+            currentUserRef.set({
+                name: username,
+                joinedAt: new Date().toISOString()
+            });
+            
+            // تحديث عدد المستخدمين المتصلين
+            database.ref('onlineUsers').on('value', (snapshot) => {
+                const users = snapshot.val();
+                const count = users ? Object.keys(users).length : 0;
+                onlineCount.textContent = count;
+            });
+            
+            // تحميل الرسائل السابقة
+            database.ref('messages').on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message);
+                // التمرير لأسفل
+                setTimeout(() => {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 100);
+            });
+            
+            // تبديل الشاشات
+            loginScreen.style.display = 'none';
+            chatScreen.style.display = 'block';
+            
+            // تفعيل الإدخال
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+            messageInput.focus();
+            
+            // إضافة رسالة ترحيب
+            const welcomeMessage = {
+                text: `مرحباً ${username}! يمكنك البدء في المناقشة الآن.`,
+                sender: "System",
+                time: new Date().toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
+            };
+            displayMessage(welcomeMessage);
+        }
+
+        // إرسال رسالة
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+            
+            const messageData = {
+                text: text,
+                sender: username,
+                time: new Date().toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }),
+                timestamp: Date.now()
+            };
+            
+            // حفظ الرسالة في Firebase
+            database.ref('messages').push(messageData);
+            
+            // مسح حقل الإدخال
+            messageInput.value = '';
+            messageInput.focus();
+        }
+
+        // عرض رسالة
+        function displayMessage(message) {
+            const messageDiv = document.createElement('div');
+            const isMe = message.sender === username;
+            const isSystem = message.sender === "System";
+            
+            if (isSystem) {
+                messageDiv.className = 'message system';
+                messageDiv.style.textAlign = 'center';
+                messageDiv.style.maxWidth = '100%';
+                messageDiv.style.color = '#666';
+                messageDiv.style.fontSize = '13px';
+                messageDiv.style.fontStyle = 'italic';
+                messageDiv.innerHTML = message.text;
+            } else {
+                messageDiv.className = `message ${isMe ? 'me' : 'other'}`;
+                
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.textContent = message.sender;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = message.text;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = message.time;
+                
+                messageDiv.appendChild(senderDiv);
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(timeDiv);
+            }
+            
+            messageDiv.style.animation = 'fadeIn 0.3s ease';
+            messagesContainer.appendChild(messageDiv);
+            
+            // التمرير لأسفل
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // إرسال بالزر Enter
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // إرسال بالزر
+        sendBtn.addEventListener('click', sendMessage);
+
+        // عند مغادرة الصفحة
+        window.addEventListener('beforeunload', () => {
+            if (currentUserRef) {
+                currentUserRef.remove();
+            }
+        });
+
+        // تحميل اسم سابق إذا كان موجود
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('philosophyChat_username');
+            if (savedName) {
+                usernameInput.value = savedName;
+            }
+            
+            // حفظ الاسم عند الإدخال
+            usernameInput.addEventListener('input', (e) => {
+                localStorage.setItem('philosophyChat_username', e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
