@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Timer - منظم الدراسة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --study-green: #10b981;
+            --study-blue: #3b82f6;
+            --study-gray: #6b7280;
+            --study-light: #f9fafb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .study-container {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .study-logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--study-green) 0%, var(--study-blue) 100%);
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .study-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+        
+        .study-subtitle {
+            font-size: 12px;
+            color: var(--study-gray);
+        }
+        
+        .timer-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .timer-display {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--study-blue);
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .timer-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--study-blue);
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .study-tips {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        .tip-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tip-item {
+            background: #f8fafc;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #4b5563;
+            border-right: 3px solid var(--study-green);
+        }
+        
+        /* منطقة الدردشة */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .chat-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .chat-subtitle {
+            font-size: 13px;
+            color: var(--study-gray);
+            margin-top: 5px;
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--study-light);
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 85%;
+        }
+        
+        .message.study {
+            margin-right: auto;
+        }
+        
+        .message.user {
+            margin-left: auto;
+        }
+        
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 15px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--study-blue) 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #6b7280;
+        }
+        
+        .message.user .message-sender {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .message-text {
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 8px;
+            text-align: left;
+        }
+        
+        .message.user .message-time {
+            color: rgba(255,255,255,0.7);
+            text-align: right;
+        }
+        
+        .hidden-notice {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #92400e;
+            display: none;
+            text-align: center;
+        }
+        
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            position: relative;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        #messageInput:focus {
+            border-color: var(--study-blue);
+        }
+        
+        #sendBtn {
+            background: var(--study-green);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        #sendBtn:hover {
+            transform: scale(1.05);
+        }
+        
+        .hidden-commands {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--study-gray);
+            text-align: center;
+        }
+        
+        .command-hint {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin: 0 3px;
+            cursor: pointer;
+        }
+        
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--study-green) 0%, var(--study-blue) 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+        
+        .login-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        
+        .login-subtitle {
+            color: var(--study-gray);
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        #usernameInput {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        #usernameInput:focus {
+            border-color: var(--study-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        #joinBtn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--study-green) 0%, var(--study-blue) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #joinBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .security-note {
+            margin-top: 20px;
+            font-size: 11px;
+            color: var(--study-gray);
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .secret-mode {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .study-container {
+                flex-direction: column;
+                height: 95vh;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 20px;
+            }
+            
+            .study-tips {
+                display: none;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h2 class="login-title">Study Timer Pro</h2>
+            <p class="login-subtitle">منظم الدراسة الذكي مع مؤقت مدمج للمذاكرة الفعالة</p>
+            <input type="text" id="usernameInput" placeholder="ادخل اسم الطالب" maxlength="20" autocomplete="off">
+            <button id="joinBtn">بدء جلسة الدراسة</button>
+            <p class="security-note">
+                <i class="fas fa-shield-alt"></i> نظام آمن للمذاكرة الجماعية
+            </p>
+        </div>
+    </div>
+
+    <!-- الواجهة الرئيسية -->
+    <div class="study-container" id="mainContainer" style="display: none;">
+        <!-- منطقة الدردشة -->
+        <div class="chat-area">
+            <!-- المؤشر السري -->
+            <div class="secret-mode" id="secretMode" style="display: none;"></div>
+            
+            <!-- رأس الدردشة -->
+            <div class="chat-header">
+                <div class="chat-title">مجموعة دراسة الفلسفة</div>
+                <div class="chat-subtitle">جلسة دراسة جماعية - مؤقت نشط</div>
+            </div>
+            
+            <!-- إشعار سري -->
+            <div class="hidden-notice" id="hiddenNotice">
+                <i class="fas fa-user-secret"></i>
+                <span id="noticeText">الوضع السري مفعل - الرسائل ستحذف تلقائياً</span>
+            </div>
+            
+            <!-- الرسائل -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- الرسائل تظهر هنا -->
+                <div class="message study">
+                    <div class="message-content">
+                        <div class="message-sender">نظام الدراسة</div>
+                        <div class="message-text">
+                            مرحباً بكم في جلسة الدراسة الجماعية. استخدموا المؤقت لتنظيم فترات المذاكرة والراحة.
+                        </div>
+                        <div class="message-time">الآن</div>
+                    </div>
+                </div>
+                
+                <div class="message study">
+                    <div class="message-content">
+                        <div class="message-sender">نظام الدراسة</div>
+                        <div class="message-text">
+                            نصائح للدراسة:<br>
+                            • 25 دقيقة دراسة + 5 دقائق راحة<br>
+                            • استخدم المؤقت لتنظيم الوقت<br>
+                            • شارك الأسئلة مع الزملاء
+                        </div>
+                        <div class="message-time">الآن</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- منطقة الإدخال -->
+            <div class="input-area">
+                <div class="input-container">
+                    <input type="text" id="messageInput" placeholder="اكتب سؤالاً دراسياً أو رسالة..." maxlength="500" disabled>
+                    <button id="sendBtn" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="hidden-commands">
+                    <span>أوامر سرية:</span>
+                    <span class="command-hint" onclick="showCommand('/clear')">/clear</span>
+                    <span class="command-hint" onclick="showCommand('/secret')">/secret</span>
+                    <span class="command-hint" onclick="showCommand('/help')">/help</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <div class="study-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="study-title">Study Timer</div>
+                <div class="study-subtitle">إدارة الوقت الدراسي</div>
+            </div>
+            
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-controls">
+                    <button class="timer-btn" onclick="startTimer()">ابدأ</button>
+                    <button class="timer-btn" onclick="pauseTimer()">إيقاف</button>
+                    <button class="timer-btn" onclick="resetTimer()">إعادة</button>
+                </div>
+            </div>
+            
+            <div class="study-tips">
+                <div class="tip-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>نصائح دراسية</span>
+                </div>
+                <div class="tip-item">ركز على مفهوم واحد في كل جلسة</div>
+                <div class="tip-item">استراحة قصيرة كل 25 دقيقة</div>
+                <div class="tip-item">اكتب ملخصاً بعد كل فصل</div>
+                <div class="tip-item">ناقش مع زملائك للفهم الأفضل</div>
+                <div class="tip-item">راجع في الصباح للمذاكرة الفعالة</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG0BQmRtK7hUauD4LPAy66xsDpu-qblb4",
+            authDomain: "notttt-264ca.firebaseapp.com",
+            databaseURL: "https://notttt-264ca-default-rtdb.firebaseio.com",
+            projectId: "notttt-264ca",
+            storageBucket: "notttt-264ca.firebasestorage.app",
+            messagingSenderId: "608341167364",
+            appId: "1:608341167364:web:af930a0f3aa2f97a76d451"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Application Variables
+        let username = '';
+        let secretMode = false;
+        let autoDelete = false;
+        let timerInterval = null;
+        let timerSeconds = 25 * 60; // 25 minutes
+        
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContainer = document.getElementById('mainContainer');
+        const usernameInput = document.getElementById('usernameInput');
+        const joinBtn = document.getElementById('joinBtn');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const hiddenNotice = document.getElementById('hiddenNotice');
+        const noticeText = document.getElementById('noticeText');
+        const secretModeIndicator = document.getElementById('secretMode');
+        
+        // Timer Functions
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    // إشعار انتهاء الوقت
+                    addSystemMessage("⏰ انتهت جلسة الدراسة! خذ استراحة 5 دقائق.");
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 25 * 60;
+            updateTimerDisplay();
+        }
+        
+        // Join Chat
+        joinBtn.addEventListener('click', joinChat);
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinChat();
+        });
+        
+        function joinChat() {
+            username = usernameInput.value.trim();
+            if (!username) {
+                alert('الرجاء إدخال اسم الطالب');
+                return;
+            }
+            
+            localStorage.setItem('studyChat_username', username);
+            
+            loginScreen.style.display = 'none';
+            mainContainer.style.display = 'flex';
+            
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+            
+            // Register user
+            const userRef = database.ref('users/' + username);
+            userRef.set({
+                name: username,
+                status: 'studying',
+                joinedAt: new Date().toISOString()
+            });
+            
+            userRef.onDisconnect().remove();
+            
+            // Load messages
+            database.ref('messages').on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message);
+                
+                setTimeout(() => {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 100);
+            });
+            
+            // Auto-delete old messages in secret mode
+            setInterval(() => {
+                if (autoDelete) {
+                    deleteOldMessages();
+                }
+            }, 30000); // كل 30 ثانية
+            
+            messageInput.focus();
+            updateTimerDisplay();
+            
+            // Welcome message
+            setTimeout(() => {
+                addSystemMessage(`مرحباً ${username}! جلسة الدراسة جاهزة.`);
+            }, 1000);
+        }
+        
+        // Send Message
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !username) return;
+            
+            // Check for commands
+            if (text.startsWith('/')) {
+                processCommand(text);
+                messageInput.value = '';
+                return;
+            }
+            
+            const message = {
+                text: text,
+                sender: username,
+                time: new Date().toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }),
+                timestamp: Date.now(),
+                secret: secretMode
+            };
+            
+            database.ref('messages').push(message);
+            messageInput.value = '';
+            messageInput.focus();
+        }
+        
+        // Process Commands
+        function processCommand(command) {
+            const parts = command.split(' ');
+            const cmd = parts[0].toLowerCase();
+            
+            switch(cmd) {
+                case '/clear':
+                    // مسح المحادثة محلياً فقط
+                    messagesContainer.innerHTML = '';
+                    addSystemMessage("🗑️ تم مسح المحادثة من شاشتك فقط.");
+                    break;
+                    
+                case '/secret':
+                    // تفعيل الوضع السري
+                    secretMode = !secretMode;
+                    autoDelete = secretMode;
+                    secretModeIndicator.style.display = secretMode ? 'block' : 'none';
+                    hiddenNotice.style.display = secretMode ? 'block' : 'none';
+                    noticeText.textContent = secretMode ? 
+                        "الوضع السري مفعل - الرسائل ستحذف تلقائياً بعد 30 ثانية" :
+                        "الوضع السري معطل";
+                    
+                    addSystemMessage(secretMode ? 
+                        "🔒 الوضع السري مفعل - الرسائل ستختفي تلقائياً" :
+                        "🔓 الوضع السري معطل"
+                    );
+                    break;
+                    
+                case '/help':
+                    addSystemMessage(`
+                        <b>أوامر سرية:</b><br>
+                        • <code>/clear</code> - مسح الشاشة فقط<br>
+                        • <code>/secret</code> - تفعيل/تعطيل الوضع السري<br>
+                        • <code>/help</code> - عرض هذه المساعدة<br>
+                        • <code>/time</code> - عرض الوقت المتبقي<br>
+                        • أي رسالة تبدأ بـ / تصل لك فقط
+                    `);
+                    break;
+                    
+                case '/time':
+                    const remaining = Math.floor(timerSeconds / 60);
+                    addSystemMessage(`⏰ الوقت المتبقي: ${remaining} دقيقة`);
+                    break;
+                    
+                default:
+                    // إرسال رسالة خاصة (تظهر لك فقط)
+                    const privateText = parts.slice(1).join(' ');
+                    if (privateText) {
+                        addPrivateMessage(privateText);
+                    }
+            }
+        }
+        
+        // Delete Old Messages
+        function deleteOldMessages() {
+            const cutoff = Date.now() - 30000; // 30 ثانية
+            database.ref('messages').once('value').then((snapshot) => {
+                const updates = {};
+                snapshot.forEach((child) => {
+                    const msg = child.val();
+                    if (msg.timestamp < cutoff) {
+                        updates[child.key] = null;
+                    }
+                });
+                database.ref('messages').update(updates);
+            });
+        }
+        
+        // Display Message
+        function displayMessage(message) {
+            // تخطي الرسائل السرية القديمة إذا كنا في وضع عادي
+            if (message.secret && !secretMode && message.sender !== username) {
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            const isSystem = message.sender === 'نظام الدراسة';
+            const isMe = message.sender === username;
+            
+            messageDiv.className = `message ${isSystem ? 'study' : (isMe ? 'user' : 'study')}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-sender">${message.sender}</div>
+                    <div class="message-text">${message.text}</div>
+                    <div class="message-time">${message.time}</div>
+                </div>
+            `;
+            
+            if (message.secret) {
+                messageDiv.style.opacity = '0.9';
+                messageDiv.style.borderLeft = '3px solid #ef4444';
+            }
+            
+            messageDiv.style.animation = 'fadeIn 0.3s ease';
+            messagesContainer.appendChild(messageDiv);
+        }
+        
+        // Add System Message
+        function addSystemMessage(text) {
+            const systemMsg = {
+                text: text,
+                sender: 'نظام الدراسة',
+                time: new Date().toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }),
+                timestamp: Date.now()
+            };
+            displayMessage(systemMsg);
+        }
+        
+        // Add Private Message (لك فقط)
+        function addPrivateMessage(text) {
+            const privateDiv = document.createElement('div');
+            privateDiv.className = 'message user';
+            privateDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-sender">أنت (خاص)</div>
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">خاص</div>
+                </div>
+            `;
+            privateDiv.style.opacity = '0.7';
+            privateDiv.style.fontStyle = 'italic';
+            messagesContainer.appendChild(privateDiv);
+        }
+        
+        // Show Command in Input
+        function showCommand(cmd) {
+            messageInput.value = cmd + ' ';
+            messageInput.focus();
+        }
+        
+        // Event Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Load saved username
+        window.addEventListener('load', () => {
+            const savedUsername = localStorage.getItem('studyChat_username');
+            if (savedUsername) {
+                usernameInput.value = savedUsername;
+            }
+        });
+        
+        // Clear typing on page leave
+        window.addEventListener('beforeunload', () => {
+            if (username) {
+                database.ref('users/' + username).remove();
+            }
+        });
+        
+        // إضافة بعض الرسائل الأولية
+        setTimeout(() => {
+            const tips = [
+                "💡 استخدم المؤقت للدراسة بتركيز",
+                "📚 شارك ما تعلمته مع الزملاء",
+                "⏱️ تذكر: 25 دقيقة دراسة + 5 دقائق راحة"
+            ];
+            
+            tips.forEach((tip, index) => {
+                setTimeout(() => {
+                    if (messagesContainer.children.length < 8) {
+                        addSystemMessage(tip);
+                    }
+                }, index * 2000);
+            });
+        }, 3000);
+    </script>
+</body>
+</html>
