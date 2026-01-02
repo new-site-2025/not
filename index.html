@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راديو المنشاوي | بث مباشر</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a1929;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .radio-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* موجات الراديو المتحركة */
+        .radio-waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        
+        .wave {
+            position: absolute;
+            border: 2px solid #4CAF50;
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+        
+        .wave:nth-child(1) { width: 100px; height: 100px; top: 50%; left: 50%; margin: -50px 0 0 -50px; animation-delay: 0s; }
+        .wave:nth-child(2) { width: 200px; height: 200px; top: 50%; left: 50%; margin: -100px 0 0 -100px; animation-delay: 0.5s; }
+        .wave:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; margin: -150px 0 0 -150px; animation-delay: 1s; }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .status {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid #4CAF50;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 30px 0;
+            font-size: 1.1rem;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        
+        .play-button {
+            background: #4CAF50;
+            border: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            color: white;
+            cursor: pointer;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+        }
+        
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+        }
+        
+        .play-button.playing {
+            background: #f44336;
+            box-shadow: 0 10px 30px rgba(244, 67, 54, 0.4);
+        }
+        
+        .frequency {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+        
+        /* الأنيميشن */
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* تأثيرات صوتية */
+        .volume-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .volume-level {
+            height: 100%;
+            background: #4CAF50;
+            width: 70%;
+            border-radius: 2px;
+            animation: volumeWave 2s infinite ease-in-out;
+        }
+        
+        @keyframes volumeWave {
+            0%, 100% { width: 60%; }
+            50% { width: 80%; }
+        }
+        
+        /* التجاوب */
+        @media (max-width: 480px) {
+            .radio-container {
+                padding: 40px 30px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .play-button {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-container">
+        <!-- موجات الراديو -->
+        <div class="radio-waves">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+        
+        <!-- المحتوى -->
+        <div class="content">
+            <h1>📻 راديو المنشاوي</h1>
+            <p style="color: #aaa; margin-bottom: 20px;">بث مباشر مستمر</p>
+            
+            <div class="status" id="status">
+                <div class="status-dot"></div>
+                <span id="statusText">جاري التحميل...</span>
+            </div>
+            
+            <div class="play-button" id="playButton">
+                <span id="playIcon">▶</span>
+            </div>
+            
+            <!-- شريط الصوت الوهمي -->
+            <div class="volume-bar">
+                <div class="volume-level"></div>
+            </div>
+            
+            <div class="frequency">FM 98.7 • القرآن الكريم</div>
+        </div>
+    </div>
+
+    <!-- مشغل الصوت المخفي -->
+    <audio id="audioPlayer" preload="none"></audio>
+
+    <script>
+        // ============================================
+        // إعدادات الراديو
+        // ============================================
+        
+        // قائمة التلاوات (بدون أسماء، فقط روابط)
+        const radioStreams = [
+            // روابط مباشرة للتلاوات
+            "https://server8.mp3quran.net/minsh/001.mp3",
+            "https://server8.mp3quran.net/minsh/002.mp3", 
+            "https://server8.mp3quran.net/minsh/036.mp3",
+            "https://server8.mp3quran.net/minsh/055.mp3",
+            "https://server8.mp3quran.net/minsh/067.mp3",
+            "https://server8.mp3quran.net/minsh/078.mp3",
+            "https://server8.mp3quran.net/minsh/112.mp3"
+        ];
+        
+        // ============================================
+        // المتغيرات
+        // ============================================
+        const audio = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const playIcon = document.getElementById('playIcon');
+        const statusText = document.getElementById('statusText');
+        
+        let currentTrack = 0;
+        let isPlaying = false;
+        let userStarted = false;
+        
+        // ============================================
+        // الدوال الأساسية
+        // ============================================
+        
+        // تشغيل الراديو
+        function playRadio() {
+            if (!userStarted) {
+                userStarted = true;
+                statusText.textContent = "جاري بدء البث...";
+            }
+            
+            // اختر تلاوة عشوائية
+            currentTrack = Math.floor(Math.random() * radioStreams.length);
+            const streamUrl = radioStreams[currentTrack];
+            
+            // حاول مع سيرفرات مختلفة إذا فشل الأول
+            const backupUrls = [
+                streamUrl,
+                streamUrl.replace('server8', 'server7'),
+                streamUrl.replace('server8', 'server6')
+            ];
+            
+            function tryPlay(urlIndex) {
+                if (urlIndex >= backupUrls.length) {
+                    // جميع المحاولات فشلت
+                    statusText.textContent = "⚠️ خطأ في الاتصال";
+                    setTimeout(() => playRadio(), 3000);
+                    return;
+                }
+                
+                audio.src = backupUrls[urlIndex];
+                
+                audio.play().then(() => {
+                    isPlaying = true;
+                    playButton.classList.add('playing');
+                    playIcon.textContent = "⏸";
+                    statusText.textContent = "🔴 بث مباشر";
+                }).catch(error => {
+                    console.log(`محاولة ${urlIndex + 1} فشلت، جاري المحاولة التالية...`);
+                    tryPlay(urlIndex + 1);
+                });
+            }
+            
+            // ابدأ المحاولة الأولى
+            tryPlay(0);
+        }
+        
+        // إيقاف الراديو
+        function pauseRadio() {
+            audio.pause();
+            isPlaying = false;
+            playButton.classList.remove('playing');
+            playIcon.textContent = "▶";
+            statusText.textContent = "⏸ متوقف";
+        }
+        
+        // تبديل التشغيل/الإيقاف
+        function toggleRadio() {
+            if (isPlaying) {
+                pauseRadio();
+            } else {
+                playRadio();
+            }
+        }
+        
+        // ============================================
+        // إعداد الأحداث
+        // ============================================
+        
+        // عند انتهاء التلاوة، ابدأ التالية
+        audio.addEventListener('ended', function() {
+            // انتقل للتلاوة التالية
+            currentTrack = (currentTrack + 1) % radioStreams.length;
+            playRadio();
+        });
+        
+        // أحداث الأخطاء
+        audio.addEventListener('error', function() {
+            if (isPlaying) {
+                statusText.textContent = "📡 إعادة الاتصال...";
+                setTimeout(() => playRadio(), 2000);
+            }
+        });
+        
+        // زر التشغيل
+        playButton.addEventListener('click', toggleRadio);
+        
+        // ============================================
+        // بدء الراديو تلقائياً
+        // ============================================
+        
+        // بدء التشغيل التلقائي بعد تحميل الصفحة
+        window.addEventListener('load', function() {
+            statusText.textContent = "جاهز للبث";
+            
+            // ابدأ التشغيل تلقائياً بعد 2 ثانية
+            setTimeout(() => {
+                if (!userStarted) {
+                    playRadio();
+                }
+            }, 2000);
+        });
+        
+        // ============================================
+        // اختصارات لوحة المفاتيح
+        // ============================================
+        document.addEventListener('keydown', function(event) {
+            // مسافة للتشغيل/الإيقاف
+            if (event.code === 'Space') {
+                event.preventDefault();
+                toggleRadio();
+            }
+            
+            // زر Escape للإيقاف
+            if (event.code === 'Escape') {
+                pauseRadio();
+            }
+        });
+        
+        // ============================================
+        // تحسينات إضافية
+        // ============================================
+        
+        // إظهار أن الراديو يعمل حتى عند تبديل التبويبات
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && isPlaying && audio.paused) {
+                // إذا عدنا للتبويب وكان الصوت متوقفاً
+                audio.play().catch(e => {
+                    // إعادة المحاولة
+                    setTimeout(() => playRadio(), 1000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
