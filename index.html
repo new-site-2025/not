@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>راديو الشيخ المنشاوي | مجود</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Tahoma, sans-serif;
+    background: #0a0a0a;
+    color: #d4d4d4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(0, 80, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 60, 0, 0.1) 0%, transparent 50%);
+}
+
+.container {
+    position: relative;
+    width: 320px;
+    padding: 5px;
+    background: linear-gradient(145deg, #111, #000);
+    border-radius: 12px;
+    box-shadow: 
+        0 0 20px #00ff99,
+        0 0 40px rgba(0, 255, 153, 0.3),
+        inset 0 0 15px rgba(0, 0, 0, 0.8);
+    border: 1px solid #004d26;
+}
+
+.radio-body {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #333;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.radio-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #00ff99;
+    margin-bottom: 5px;
+    text-shadow: 0 0 8px rgba(0, 255, 153, 0.5);
+    letter-spacing: 1px;
+}
+
+.radio-sub {
+    font-size: 14px;
+    color: #8a8a8a;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #333;
+    padding-bottom: 15px;
+}
+
+/* موجات الراديو */
+.radio-waves {
+    height: 60px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 20, 10, 0.3);
+    border-radius: 5px;
+    border: 1px solid #002211;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    background: linear-gradient(to top, transparent, #00ff99);
+    border-radius: 50%;
+    animation: waveMove 3s infinite ease-in-out;
+    opacity: 0.7;
+}
+
+.wave:nth-child(1) {
+    width: 80%;
+    left: 10%;
+    animation-delay: 0s;
+    height: 40%;
+}
+
+.wave:nth-child(2) {
+    width: 60%;
+    left: 20%;
+    animation-delay: 0.5s;
+    height: 60%;
+}
+
+.wave:nth-child(3) {
+    width: 40%;
+    left: 30%;
+    animation-delay: 1s;
+    height: 30%;
+}
+
+@keyframes waveMove {
+    0%, 100% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(10px) scaleY(1.2); }
+}
+
+/* عناصر التحكم */
+.controls {
+    margin: 25px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.control-btn {
+    background: linear-gradient(to bottom, #222, #000);
+    border: 2px solid #00cc77;
+    color: #00ff99;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(0, 255, 153, 0.2);
+    min-width: 100px;
+}
+
+.control-btn:hover {
+    background: linear-gradient(to bottom, #004422, #002211);
+    box-shadow: 0 0 15px #00ff99;
+    transform: translateY(-2px);
+}
+
+.control-btn:active {
+    transform: translateY(1px);
+}
+
+#pause {
+    border-color: #ff5555;
+    color: #ff7777;
+}
+
+#pause:hover {
+    box-shadow: 0 0 15px #ff5555;
+}
+
+.status {
+    margin-top: 15px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.live-dot {
+    width: 10px;
+    height: 10px;
+    background: #ff0000;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 10px #ff0000;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.frequency {
+    color: #00ff99;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 14px;
+    background: rgba(0, 30, 15, 0.5);
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    border: 1px solid #003311;
+}
+
+.old-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.03) 0px,
+        rgba(0, 0, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+.radio-footer {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #555;
+    border-top: 1px solid #222;
+    padding-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="old-effect"></div>
+    
+    <div class="radio-body">
+        <div class="radio-title">راديو المنشاوي</div>
+        <div class="radio-sub">تلاوات مُجَوَّدة - بث مباشر</div>
+        
+        <div class="radio-waves">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+        
+        <div class="frequency">📻 تردد: 98.7 FM</div>
+        
+        <audio id="radio"></audio>
+        
+        <div class="controls">
+            <button class="control-btn" id="play">▶ تشغيل</button>
+            <button class="control-btn" id="pause">⏸ إيقاف</button>
+        </div>
+        
+        <div class="status">
+            <div class="live-dot"></div>
+            <span>البث المباشر قيد التشغيل</span>
+        </div>
+        
+        <div class="radio-footer">
+            © راديو القرآن الكريم | الشيخ محمد صديق المنشاوي
+        </div>
+    </div>
+</div>
+
+<script>
+const audio = document.getElementById("radio");
+const waves = document.querySelectorAll('.wave');
+
+// مصدر البث
+audio.src = "https://backup.qurango.net/radio/mohammed_siddiq_alminshawi_mojawwad";
+audio.preload = "none";
+
+// حدث التشغيل
+document.getElementById("play").onclick = function () {
+    audio.play();
+    waves.forEach(wave => {
+        wave.style.animationPlayState = "running";
+    });
+    document.querySelector('.radio-waves').style.backgroundColor = "rgba(0, 40, 20, 0.5)";
+};
+
+// حدث الإيقاف
+document.getElementById("pause").onclick = function () {
+    audio.pause();
+    waves.forEach(wave => {
+        wave.style.animationPlayState = "paused";
+    });
+    document.querySelector('.radio-waves').style.backgroundColor = "rgba(0, 20, 10, 0.3)";
+};
+
+// تأثير الخط المتقطع (قديم)
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes scanline {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100vh); }
+    }
+    
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            to bottom,
+            transparent 50%,
+            rgba(0, 255, 153, 0.03) 50%
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 9999;
+        animation: scanline 10s linear infinite;
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>
